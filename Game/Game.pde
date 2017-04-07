@@ -116,16 +116,25 @@ void drawBarChart(){
   barChart.background(0,0,0,0);
   barChart.fill(0);
   for(int i = 0; i < scores.size(); i++){
-    int r = (int)Math.floor(scores.get(i)/5);
-    for(int j = 0; j < r; j++){
-      barChart.rect(1+(i*chartWidth),76-(j*5),chartWidth-2,3);
+    if(scores.get(i) <0){
+      int r = (int)Math.floor(-scores.get(i)/5);
+      barChart.fill(255);
+      for(int j = 0; j < r; j++){
+        barChart.rect(1+(i*chartWidth),76-(j*5),chartWidth-2,3);
+      }
+    }else{
+      int r = (int)Math.floor(scores.get(i)/5);
+      barChart.fill(0);
+      for(int j = 0; j < r; j++){
+        barChart.rect(1+(i*chartWidth),76-(j*5),chartWidth-2,3);
+      }
     }
   }
   barChart.endDraw();
 }
 
 void mouseDragged() {
-  if (!shiftMode) {
+  if (!shiftMode && (mouseY < height - 20)) {
     
     rx -= (pmouseY - mouseY)*speed/500.0;
     rz -= (pmouseX - mouseX)*speed/500.0;

@@ -31,6 +31,7 @@ void draw() {
   directionalLight(50, 100, 125, 0, 1, 0);
   ambientLight(102, 102, 102);
   background(200);
+  text("X-Rotation: " + (double)round(rz*180*100/PI)/100 + "   Y-Rotation: " + (double)round(rx*180*100/PI)/100 + "   Speed: " + (double)round(speed*100)/100, 10, 10);   
   pushMatrix();
   translate(width/2, height/2, 0);
   if (!shiftMode) {

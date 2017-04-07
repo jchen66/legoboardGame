@@ -1,1 +1,1 @@
-The first repository. Hello World.
+Repository for the Visual Prog project.

@@ -1,9 +1,10 @@
 class Sphere {
-  float radius = 28;
+  float radius = 14;
   PVector location;
   PVector velocity;
+  double v = 0;
   PVector gravityForce;
-  float gravityConstant = 0.0981;
+  float gravityConstant = 0.1;
   float groundHeight = radius+boxHeight/2;
   float normalForce = 1;
   float mu = 0.01;
@@ -22,10 +23,11 @@ class Sphere {
     friction.mult(-1);
     friction.normalize();
     friction.mult(frictionMagnitude);
-
     velocity.add(gravityForce);
     velocity.add(friction);
     location.add(velocity);
+    v = Math.pow(Math.pow(velocity.x,2) + Math.pow(velocity.z,2), 0.5);
+    if(v < 0.1) v = 0;
   }
 
   void display() {
@@ -42,33 +44,53 @@ class Sphere {
   void checkEdges() {
     if (location.y > -groundHeight) {
       location.y = -groundHeight;
+      score -= v;
+      scores.add(score);
+      scoreChange = -v;
     }
     if (location.x > boxWidth/2) {
       location.x = boxWidth/2;
       velocity.x = -velocity.x;
+      score -= v;
+      scores.add(score);
+      scoreChange = -v;
     }
     if (location.x < -boxWidth/2) {
       location.x = -boxWidth/2;
       velocity.x = -velocity.x;
+      score -= v;
+      scores.add(score);
+      scoreChange = -v;
     }
     if (location.z > boxWidth/2) {
       location.z = boxWidth/2;
       velocity.z = -velocity.z;
+      score -= v;
+      scores.add(score);
+      scoreChange = -v;
     }
     if (location.z < -boxWidth/2) {
       location.z = -boxWidth/2;
       velocity.z = -velocity.z;
+      score -= v;
+      scores.add(score);
+      scoreChange = -v;
     }
   }
   
     
   void checkCylinderCollision(){
     for(int i = 0; i<cylinders.size(); i++){
-      double dist = Math.pow(Math.pow(location.x - positions.get(i).x,2) + Math.pow(location.z - positions.get(i).y,2), 0.5);
+      double dist = Math.pow(Math.pow(location.x - cylinders.get(i).getPosition().x,2) + Math.pow(location.z - cylinders.get(i).getPosition().z,2), 0.5);
       if(dist < radius + cylinderBaseSize){
         //collision
-        PVector n = new PVector(location.x - positions.get(i).x, 0, location.z - positions.get(i).y);
+        scoreChange = v;
+        score +=v;
+        scores.add(score);
+        PVector n = new PVector(location.x - cylinders.get(i).getPosition().x, 0, location.z - cylinders.get(i).getPosition().z);
         n = n.normalize();
+        location.x = cylinders.get(i).getPosition().x + n.x*(radius + cylinderBaseSize);
+        location.z = cylinders.get(i).getPosition().z + n.z*(radius + cylinderBaseSize);
         PVector V2 = velocity.sub(n.mult(2*(velocity.dot(n))));
         velocity = V2;
       }

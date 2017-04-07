@@ -9,7 +9,7 @@ class Cylinder {
   float[] x;
   float[] y;
 
-  Cylinder(float xx, float yy) { //constructor most likely inefficient, requires some modifications
+  Cylinder(float xx, float yy) {
     location = new PVector(xx, -groundHeight, yy);
     x = new float[cylinderResolution + 1];
     y = new float[cylinderResolution + 1];
@@ -31,16 +31,27 @@ class Cylinder {
     openCylinder.endShape();
     surface.endShape();
   }
+  
+  public PVector getPosition(){
+    return location;
+  }
 
   void display() {
+    
     pushMatrix();
     if (!shiftMode) {
       translate(location.x, location.y, location.z);
       rotateX(-PI/2);
+      openCylinder.setStroke(false);
+      surface.setStroke(false);
     } else {
       translate(location.x, location.z, cylinderHeight);
+      openCylinder.setStroke(true);
+      surface.setStroke(true);
       rotateX(-PI);
     }
+    openCylinder.setFill(color(150,150,50));
+    surface.setFill(color(150,150,50));
     shape(openCylinder);
     shape(surface);
     popMatrix();

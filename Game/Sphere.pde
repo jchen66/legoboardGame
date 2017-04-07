@@ -42,39 +42,63 @@ class Sphere {
   }
 
   void checkEdges() {
+    int isE=0;
     if (location.y > -groundHeight) {
       location.y = -groundHeight;
-      score -= v;
-      scores.add(score);
+      
+      if(isOutside==false){
+        score -= v;
+        scores.add(score);
+      }
       scoreChange = -v;
+      isE++;
     }
     if (location.x > boxWidth/2) {
       location.x = boxWidth/2;
       velocity.x = -velocity.x;
-      score -= v;
-      scores.add(score);
+      
+      if(isOutside==false){
+        score -= v;
+        scores.add(score);
+      }
       scoreChange = -v;
+      isE++;
     }
     if (location.x < -boxWidth/2) {
       location.x = -boxWidth/2;
       velocity.x = -velocity.x;
-      score -= v;
-      scores.add(score);
+      if(isOutside==false){
+        score -= v;
+        scores.add(score);
+      }
       scoreChange = -v;
+      isE++;
     }
     if (location.z > boxWidth/2) {
       location.z = boxWidth/2;
       velocity.z = -velocity.z;
-      score -= v;
-      scores.add(score);
+      if(isOutside==false){
+        score -= v;
+        scores.add(score);
+      }
       scoreChange = -v;
+      isE++;
     }
     if (location.z < -boxWidth/2) {
       location.z = -boxWidth/2;
       velocity.z = -velocity.z;
-      score -= v;
-      scores.add(score);
+      if(isOutside==false){
+        score -= v;
+        scores.add(score);
+      }
       scoreChange = -v;
+      isE++;
+    }
+    if(isE>0){
+      isOutside=true;
+    }
+    else{
+      isOutside=false;
     }
   }
   

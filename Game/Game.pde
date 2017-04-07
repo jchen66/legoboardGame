@@ -13,6 +13,8 @@ double scoreChange =0;
 HScrollbar hscrollbar;
 ArrayList<Double> scores = new ArrayList();
 int chartWidth = 3;
+boolean isOutside=false;
+
 
 void settings() {
   size(1280, 600, P3D);

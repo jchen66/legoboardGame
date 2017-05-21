@@ -61,8 +61,6 @@ void draw() {
   
   //Blob detection
   img3 = bd.findConnectedComponents(img2, false);
-  img3.resize(resizedWidth, resizedHeight);
-  image(img3, resizedWidth, 0);
   
   //Blurring
   img4 = scharr(img3);
@@ -82,6 +80,9 @@ void draw() {
   for(PVector corner : bestQuad){
     ellipse(corner.x, corner.y, 10/RESIZE_BY, 10/RESIZE_BY);
   }
+  
+  img3.resize(resizedWidth, resizedHeight);
+  image(img3, resizedWidth, 0);
   
   img4.resize(resizedWidth,resizedHeight);
   image(img4, 2*resizedWidth, 0); //<>//

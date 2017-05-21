@@ -57,7 +57,7 @@ class QuadGraph {
 
   void build(List<PVector> lines, int width, int height) {
 
-    int n = lines.size();
+    int n = lines.size(); //<>//
 
     // The maximum possible number of edges is n * (n - 1)/2
     graph = new int[n * (n - 1)/2][2];

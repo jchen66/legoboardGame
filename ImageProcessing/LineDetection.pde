@@ -87,24 +87,14 @@ List<PVector> hough(PImage edgeImg) { //<>// //<>//
       
       // compute the intersection of this line with the 4 borders of
       // the image
-      int x0 = 0;
-      int y0 = (int) (r / sin(phi));
-      int x1 = (int) (r / cos(phi));
-      int y1 = 0;
-      int x2 = (int) edgeImg.width;
-      int y2 = (int) (-cos(phi) / sin(phi) * x2 + r / sin(phi));
-      int y3 = (int) edgeImg.width;
-      int x3 = (int) - ((y3 - r / sin(phi)) * sin(phi) / cos(phi));
-      
-      /*int test = 2;
-      x0 = x0/test;
-      x1 = x1/test;
-      x2 = x2/test;
-      x3 = x3/test;
-      y0 = y0/test;
-      y1 = y1/test;
-      y2 = y2/test;
-      y3 = y3/test;*/
+      int x0 = 0/RESIZE_BY;
+      int y0 = (int) (r / sin(phi))/RESIZE_BY;
+      int x1 = (int) (r / cos(phi))/RESIZE_BY;
+      int y1 = 0/RESIZE_BY;
+      int x2 = (int) edgeImg.width/RESIZE_BY;
+      int y2 = (int) (-cos(phi) / sin(phi) * x2 + r / sin(phi))/RESIZE_BY;
+      int y3 = (int) edgeImg.width/RESIZE_BY;
+      int x3 = (int) - ((y3 - r / sin(phi)) * sin(phi) / cos(phi))/RESIZE_BY;
       
       // Finally, plot the lines
       stroke(204, 102, 0);

@@ -38,12 +38,17 @@ class QuadGraph {
       if (isConvex(c1, c2, c3, c4) && 
         nonFlatQuad(c1, c2, c3, c4)) {
         float quadArea=validArea(c1, c2, c3, c4, max_quad_area, min_quad_area);
-        if (quadArea>0 && quadArea>bestQuadArea) { //<>//
+        if (quadArea>0 && quadArea>bestQuadArea) {
           bestQuadArea=quadArea;
           bestQuad=quad;
           
-          fill(color(20, 20, 200, 140));
-          quad(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, c4.x, c4.y);
+          c1 = c1.div(RESIZE_BY);
+          c2 = c2.div(RESIZE_BY);
+          c3 = c3.div(RESIZE_BY);
+          c4 = c4.div(RESIZE_BY);
+              
+          /*fill(color(20, 20, 200, 140));
+          quad(c1.x, c1.y, c2.x, c2.y, c3.x, c3.y, c4.x, c4.y);*/
       
         }
       }
@@ -57,7 +62,7 @@ class QuadGraph {
 
   void build(List<PVector> lines, int width, int height) {
 
-    int n = lines.size(); //<>//
+    int n = lines.size();
 
     // The maximum possible number of edges is n * (n - 1)/2
     graph = new int[n * (n - 1)/2][2];
@@ -117,7 +122,7 @@ class QuadGraph {
   }
 
   void findCycles(boolean verbose) {
-    cycles.clear(); //<>//
+    cycles.clear();
     for (int i = 0; i < graph.length; i++) {
       for (int j = 0; j < graph[i].length; j++) {
         findNewCycles(new int[] {graph[i][j]});

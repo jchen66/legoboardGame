@@ -7,14 +7,12 @@ PImage img2;
 PImage img3;
 PImage img4;
 
-int RESIZE_BY = 2;
+int RESIZE_BY = 2; // size of original image is divided by RESIZE_BY
 int nLines = 6;
 
-//Float SOBEL_MAX_VALUE_RATIO = 0.20;
+//HScrollbar thresholdBar;
+//HScrollbar thresholdBar2;
 
-PImage houghTest;
-HScrollbar thresholdBar;
-HScrollbar thresholdBar2;
 BlobDetection bd = new BlobDetection();
 int thr = 128;
 float h1 = 128;
@@ -29,9 +27,12 @@ void setup() {
   //thresholdBar = new HScrollbar(0, 580, 800, 20);
   //thresholdBar2 = new HScrollbar(0, 550, 800, 20);
   img = loadImage("board1.jpg");
+  //img = loadImage("board2.jpg");
+  //img = loadImage("board3.jpg");
+  //img = loadImage("board4.jpg");
 }
 void draw() {
-  background(color(0, 0, 0));
+  background(color(128, 128, 128));
   
   int resizedHeight = img.height / RESIZE_BY;
   int resizedWidth = img.width / RESIZE_BY;
@@ -43,12 +44,6 @@ void draw() {
   //thr = (int)(thresholdBar.getPos()*255);
   //h1 = thresholdBar.getPos()*255;
   //h2 = thresholdBar2.getPos()*255;
-  //PImage img1 = thresholdHSB(img, 100, 140, 100, 255, 25, 155);
-  //PImage img2 = bd.findConnectedComponents(img1, false);
-  //image(img2, img.width, 0);
-  //image(scharr(img1), img.width*2, 0);
-  //List<PVector> lines = hough(houghTest);
-  //image(houghTest, 0, 0);
   
   //Input image
   img1 = img.copy();
@@ -63,19 +58,28 @@ void draw() {
   img3 = bd.findConnectedComponents(img2, false);
   
   //Blurring
-  img4 = scharr(img3);
+  img4 = gaussian(img3);
   
-  List<PVector> lines = hough(img4);
+  //Edge detection
+  img4 = scharr(img4);
+  
+  //Brightness
+  thresholdB(img4, 50, 255);
+  
+  //Hough
+  List<PVector> lines = hough(img4, 4);
 
-  QuadGraph quadgraph = new QuadGraph();
+  QuadGraph quadgraph = new QuadGraph(); //<>//
   quadgraph.build(lines, img.width, img.height);
-  int min_quad_area = img.width * img.height / 20;
-  int max_quad_area = img.width * img.height * 19/20;
+  float pArea = 20;
+  int min_quad_area = (int) (img.width * img.height / pArea);
+  int max_quad_area = (int) (img.width * img.height * (pArea-1)/pArea);
   
-  List<PVector> bestQuad = quadgraph.findBestQuad(lines, img.width, img.height, //<>//
+  List<PVector> bestQuad = quadgraph.findBestQuad(lines, img.width, img.height,
     max_quad_area, min_quad_area, false);
-    
+   //<>//
   // draw the corners
+  stroke(0, 0, 0);
   fill(255, 128, 0);
   for(PVector corner : bestQuad){
     ellipse(corner.x, corner.y, 10/RESIZE_BY, 10/RESIZE_BY);
@@ -85,7 +89,7 @@ void draw() {
   image(img3, resizedWidth, 0);
   
   img4.resize(resizedWidth,resizedHeight);
-  image(img4, 2*resizedWidth, 0); //<>//
+  image(img4, 2*resizedWidth, 0);
 }
 
 PImage threshold(PImage img, int threshold) {
@@ -221,4 +225,18 @@ PImage scharr(PImage img) {
     }
   }
   return result;
+}
+
+void thresholdB(PImage image, float min, float max) {
+  image.loadPixels();
+
+  float h = 0;
+  for (int i = 0; i < image.width * image.height; i++) {
+    h = brightness(image.pixels[i]);
+    if (h < min || h > max) {
+      image.pixels[i] = color(0);
+    }else{
+      image.pixels[i] = image.pixels[i]; 
+    }
+  }
 }

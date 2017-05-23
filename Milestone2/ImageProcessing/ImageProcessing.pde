@@ -69,7 +69,7 @@ void draw() {
   //Hough
   List<PVector> lines = hough(img4, 4);
 
-  QuadGraph quadgraph = new QuadGraph();
+  QuadGraph quadgraph = new QuadGraph(); //<>// //<>//
   quadgraph.build(lines, img.width, img.height);
   float pArea = 10;
   int min_quad_area = (int) (img.width * img.height / pArea);
@@ -77,7 +77,7 @@ void draw() {
   
   List<PVector> bestQuad = quadgraph.findBestQuad(lines, img.width, img.height,
     max_quad_area, min_quad_area, false);
-  
+   //<>// //<>//
   // draw the corners
   stroke(0, 0, 0);
   fill(255, 128, 0);

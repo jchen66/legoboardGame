@@ -17,7 +17,7 @@ class QuadGraph {
     ArrayList<PVector> bestQuad=new ArrayList<PVector>();
     float bestQuadArea=0;
     for (int [] cy : cycles) {
-      ArrayList<PVector> quad= new ArrayList<PVector>();
+      ArrayList<PVector> quad= new ArrayList<PVector>(); //<>//
       PVector l1 = lines.get(cy[0]);
       PVector l2 = lines.get(cy[1]);
       PVector l3 = lines.get(cy[2]);
@@ -55,6 +55,7 @@ class QuadGraph {
     }
     if (bestQuadArea>0) {
       quadFound = true;
+      countQuadFounds++;
       return bestQuad;
     } else {
       return new ArrayList<PVector>();
@@ -319,6 +320,8 @@ class QuadGraph {
     //System.out.println(area);
     if (area < max_area && area > min_area)
       return area;
+    if(verbose)
+        System.out.println("Invalid area");
     return 0;
     
    }

@@ -8,12 +8,12 @@ PImage img2;
 PImage img3;
 PImage img4;
 
-PVector angles = new PVector(0, 0, 0);
-
 int RESIZE_BY = 2; // size of original image is divided by RESIZE_BY
 int nLines = 6;
 
 boolean quadFound = false;
+int countQuadFounds = 0;
+boolean vrbse = false;
 List<PVector> sortedCorners;
 
 //HScrollbar thresholdBar;
@@ -25,13 +25,22 @@ float h1 = 128;
 float h2 = 128;
 
 class ImageProcessing extends PApplet {
+  private PVector angles = new PVector();
+  
+  PVector getRotation() {
+    return angles;
+  }
+  
   void settings() {
     size(2400/RESIZE_BY, 600/RESIZE_BY);
   }
   void setup() {
     opencv = new OpenCV(this, 100, 100);
+  
+    cam = new Movie(this, "/Users/Alice/OneDrive - epfl.ch/MA2/Informatique visuelle/assignment13/testvideo.avi");
+    cam.loop();
     
-    noLoop();
+    //noLoop();
     //thresholdBar = new HScrollbar(0, 580, 800, 20);
     //thresholdBar2 = new HScrollbar(0, 550, 800, 20);
     //img = loadImage("board1.jpg");
@@ -39,87 +48,102 @@ class ImageProcessing extends PApplet {
     //img = loadImage("board3.jpg");
     //img = loadImage("board4.jpg");
   }
+  
   void draw() {
-    background(color(128, 128, 128));
+    if (videoRunning) {
+      if (cam.available()) {
+        cam.read();
+      }
+      img = cam.get(); 
+
+      //background(color(128, 128, 128));
+      
+      int resizedHeight = img.height / RESIZE_BY;
+      int resizedWidth = img.width / RESIZE_BY;
+      //image(img, 0, 0);
+      //thresholdBar.display();
+      //thresholdBar.update();
+      //thresholdBar2.display();
+      //thresholdBar2.update();
+      //thr = (int)(thresholdBar.getPos()*255);
+      //h1 = thresholdBar.getPos()*255;
+      //h2 = thresholdBar2.getPos()*255;
+      
+      //Input image
+      img1 = img.copy();
+      img1.resize(resizedWidth, resizedHeight);
+      image(img1, 0, 0);
+      
+      //Hue/brightness/saturation threshold
+      img2 = img.copy();
+      img2 = thresholdHSB(img2, 100, 140, 150, 255, 50, 155);
+      
+      //Blob detection
+      img3 = bd.findConnectedComponents(img2, false);
+      
+      //Blurring
+      img4 = gaussian(img3);
+      
+      //Edge detection
+      img4 = scharr(img4);
+      
+      //Brightness
+      thresholdB(img4, 50, 255);
+      
+      //Hough
+      List<PVector> lines = hough(img4, 4);
     
-    int resizedHeight = img.height / RESIZE_BY;
-    int resizedWidth = img.width / RESIZE_BY;
-    //image(img, 0, 0);
-    //thresholdBar.display();
-    //thresholdBar.update();
-    //thresholdBar2.display();
-    //thresholdBar2.update();
-    //thr = (int)(thresholdBar.getPos()*255);
-    //h1 = thresholdBar.getPos()*255;
-    //h2 = thresholdBar2.getPos()*255;
+      QuadGraph quadgraph = new QuadGraph();
+      quadgraph.build(lines, img.width, img.height);
+      float pArea = 50;
+      int min_quad_area = (int) (img.width * img.height / pArea);
+      int max_quad_area = (int) (img.width * img.height * (pArea-1)/pArea); //<>//
+      
+      List<PVector> bestQuad = quadgraph.findBestQuad(lines, img.width, img.height,
+        max_quad_area, min_quad_area, vrbse);
+      
+      // prepare homogeneous coordinates
+      ArrayList<PVector> homogCorners = new ArrayList<PVector>();
+      // draw the corners
+      stroke(0, 0, 0);
+      fill(255, 128, 0);
+      for(PVector corner : bestQuad){
+        //println("bestQuad: " + corner.x + ", " + corner.y);
+        ellipse(corner.x, corner.y, 10/RESIZE_BY, 10/RESIZE_BY);
+        homogCorners.add(homogeneous2DPoint(corner));
+      }
+      
+      img3.resize(resizedWidth, resizedHeight);
+      image(img3, resizedWidth, 0);
+      
+      img4.resize(resizedWidth,resizedHeight);
+      image(img4, 2*resizedWidth, 0);
+      if (vrbse) {
+        println(quadFound);
+        println(countQuadFounds);
+      }
+      if (quadFound)
+        sortedCorners = quadgraph.sortCorners(homogCorners);
     
-    //Input image
-    img1 = img.copy();
-    img1.resize(resizedWidth, resizedHeight);
-    image(img1, 0, 0);
+      if (sortedCorners != null) {
+        //fill(50, 250, 50, 180);
+        //quad(output.get(0).x, output.get(0).y, output.get(1).x, output.get(1).y, output.get(2).x, output.get(2).y, output.get(3).x, output.get(3).y);
     
-    //Hue/brightness/saturation threshold
-    img2 = img.copy();
-    img2 = thresholdHSB(img2, 100, 140, 100, 255, 25, 155);
-    
-    //Blob detection
-    img3 = bd.findConnectedComponents(img2, false);
-    
-    //Blurring
-    img4 = gaussian(img3);
-    
-    //Edge detection
-    img4 = scharr(img4);
-    
-    //Brightness
-    thresholdB(img4, 50, 255);
-    
-    //Hough
-    List<PVector> lines = hough(img4, 4);
-  
-    QuadGraph quadgraph = new QuadGraph(); //<>//
-    quadgraph.build(lines, img.width, img.height);
-    float pArea = 10;
-    int min_quad_area = (int) (img.width * img.height / pArea);
-    int max_quad_area = (int) (img.width * img.height * (pArea-1)/pArea);
-    
-    List<PVector> bestQuad = quadgraph.findBestQuad(lines, img.width, img.height,
-      max_quad_area, min_quad_area, false);
-     //<>//
-    // prepare homogeneous coordinates
-    ArrayList<PVector> homogCorners = new ArrayList<PVector>();
-    // draw the corners
-    stroke(0, 0, 0);
-    fill(255, 128, 0);
-    for(PVector corner : bestQuad){
-      ellipse(corner.x, corner.y, 10/RESIZE_BY, 10/RESIZE_BY);
-      homogCorners.add(homogeneous2DPoint(corner));
-    } //<>//
-    
-    img3.resize(resizedWidth, resizedHeight);
-    image(img3, resizedWidth, 0);
-    
-    img4.resize(resizedWidth,resizedHeight);
-    image(img4, 2*resizedWidth, 0);
-    
-    if (quadFound)
-      sortedCorners = quadgraph.sortCorners(homogCorners);
-  
-    if (sortedCorners != null) {
-      //fill(50, 250, 50, 180);
-      //quad(output.get(0).x, output.get(0).y, output.get(1).x, output.get(1).y, output.get(2).x, output.get(2).y, output.get(3).x, output.get(3).y);
-  
-      TwoDThreeD twoDthreeD = new TwoDThreeD(resizedWidth, resizedHeight, 0);
-      angles = twoDthreeD.get3DRotations(sortedCorners);
-      println(degrees(angles.x) + ", " + degrees(angles.y) + ", " + degrees(angles.z));
-      println(angles.x + ", " + angles.y + ", " + angles.z);
-  //board1: 172.77026, 14.172758, 3.2176714
-  //board2: 169.43741, -10.920801, 15.4895
-  //board3: -157.33789, 4.912211, 0.9941543
-  //board4: -160.41501, -44.646854, -5.328407
-    
+        TwoDThreeD twoDthreeD = new TwoDThreeD(resizedWidth, resizedHeight, 10);
+        angles = twoDthreeD.get3DRotations(sortedCorners);
+        /*if (angles.x > PI/2.0) angles.x = angles.x - PI;
+        else if (angles.x < -PI/.20) angles.x = angles.x + PI;*/
+        //println(degrees(angles.x) + ", " + degrees(angles.y) + ", " + degrees(angles.z));
+        //println(angles.x + ", " + angles.y + ", " + angles.z);
+    //board1: 172.77026, 14.172758, 3.2176714
+    //board2: 169.43741, -10.920801, 15.4895
+    //board3: -157.33789, 4.912211, 0.9941543
+    //board4: -160.41501, -44.646854, -5.328407
+      
+      }
+      quadFound = false;
     }
-  } //<>//
+  }
   
   PImage threshold(PImage img, int threshold) {
     PImage result = createImage(img.width, img.height, RGB);

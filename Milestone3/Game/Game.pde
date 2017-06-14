@@ -1,7 +1,10 @@
 import gab.opencv.*;
 import java.util.*;
+import processing.video.*;
 
 OpenCV opencv;
+ImageProcessing imgproc;
+Movie cam;
 
 float rx = 0;
 float rz = 0;
@@ -10,6 +13,7 @@ float boxHeight = 10;
 float boxWidth = 275;
 Sphere sphere;
 boolean shiftMode = false;
+boolean videoRunning = true;
 ArrayList<Cylinder> cylinders = new ArrayList();
 float cylinderBaseSize = 25.0;
 PGraphics bckgrnd, topView, scoreboard, barChart;
@@ -27,14 +31,18 @@ void settings() {
 void setup() {
   opencv = new OpenCV(this, 100, 100);
   
+  imgproc = new ImageProcessing();
+  String[] args = { "Image processing window"};
+  PApplet.runSketch(args, imgproc);
+  
   sphere = new Sphere();
   bckgrnd = createGraphics(width, height, P2D);
   topView = createGraphics(100, 100, P2D);
   scoreboard = createGraphics(200, 100, P2D);
   barChart = createGraphics(width-300, 80, P2D);
   hscrollbar = new HScrollbar (300, height-20, width-300, 20);
-  
 }
+
 void draw() {  
   camera();
   directionalLight(50, 100, 125, 0, 1, 0);
@@ -45,7 +53,13 @@ void draw() {
   translate(width/2, height/2, 0);
   if (!shiftMode) {
     noStroke();
-    //rotateX(-PI/6);
+    
+    if (videoRunning) {
+      PVector rot = imgproc.getRotation();
+      rx = rot.x;
+      rz = rot.y;
+    }
+    
     rotateX(-rx);
     rotateZ(rz);
     fill(100,255,100);
@@ -144,7 +158,7 @@ void drawBarChart(){
 }
 
 void mouseDragged() {
-  if (!shiftMode && (mouseY < height - 20)) {
+  if (!shiftMode && (mouseY < height - 20) && !videoRunning) {
     
     rx -= (pmouseY - mouseY)*speed/500.0;
     rz -= (pmouseX - mouseX)*speed/500.0;

@@ -1,8 +1,8 @@
 List<PVector> hough(PImage edgeImg, int nLines) { //<>//
   float discretizationStepsPhi = 0.06f;
   float discretizationStepsR = 2.5f;
-  int minVotes = 150;
-  int neighbourhood = 10;
+  int minVotes = 50;
+  int neighbourhood = 5;
   
   // dimensions of the accumulator
   int phiDim = (int) (Math.PI / discretizationStepsPhi + 1);

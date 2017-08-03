@@ -1,7 +1,6 @@
-<<<<<<< HEAD
-The first repository. Hello World.
+Code for Visual Computing course
 
-testing
-=======
-Repository for the Visual Prog project.
->>>>>>> 7afd31104340844c15d476b0b92cbb87f91da1cc
+
+Used image processing, augmented reality and 3D printing to create an interactive board game that consists of tilting a lego board in front of the camera to move the virtual ball to hit obstacles to collect points.
+
+
